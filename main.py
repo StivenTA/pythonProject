@@ -6,6 +6,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 import statistics
 import string
+import math
 
 def TF(wordDict, bagOfWords):
     tfDict = {}
@@ -16,27 +17,28 @@ def TF(wordDict, bagOfWords):
 
 
 def IDF(documents, len):
-    import math
     N = len
-    # print(N)
-    idfDict = dict.fromkeys(documents[0].keys(), 0)
+    # print(documents[0].values())
+    idfDict = dict.fromkeys(documents[0].keys(),0)
+    # print(idfDict)
     for document in documents:
+        # print(document)
         for word, val in document.items():
             if val > 0:
-                idfDict[word] += 1
-
-    for word, val in idfDict.items():
-        # print(float(val))
-        idfDict[word] = math.log(N / float(val))
-        # print(idfDict[word])
-
+                idfDict[word] = val
+    # print(idfDict)
+    for word,val in idfDict.items():
+        idfDict[word] = math.log(N/float(val),10)
     return idfDict
 
 
 def TFIDF(tfBagOfWords, idfs):
     tfidf = {}
+    # print (tfBagOfWords)
+    # print(idfs[0])
     for word, tf in tfBagOfWords.items():
-        tfidf[word] = tf * idfs[word]
+        # print(tf, idfs[0][word])
+        tfidf[word] = tf * idfs[0][word]
     return tfidf
 
 
@@ -69,19 +71,23 @@ bowDataset = {'data': []}
 for sentence in Dataset['data']:
     # .translate(str.maketrans('','',string.punctuation)) digunakan untuk menghilangkan tanda baca
     bowDataset['data'].append(sentence.translate(str.maketrans('','',string.punctuation)).lower().split(' '))
-print(bowDataset)
+
+
 uniqueWords = set()
 for word in bowDataset['data']:
     #untuk mencari semua kata pada dataset
     uniqueWords = uniqueWords.union(set(word))
-
+    # print(uniqueWords)
 
 numOfWordsDataset = dict.fromkeys(uniqueWords, 0)
 
 for sentence in bowDataset['data']:
-    for word in sentence:
+    for word in set(sentence):
+        # print(word)
         #mencari jumlah setiap kata muncul dari seluruh dataset
         numOfWordsDataset[word] += 1
+
+# print(numOfWordsDataset)
 
 tfDataset = {'data': []}
 for sentence in bowDataset['data']:
@@ -91,21 +97,42 @@ for sentence in bowDataset['data']:
         numOfSentenceDataset[word] += 1
     #Menghitung nilai Term Frequency untuk setiap kalimat
     tfTemp = TF(numOfSentenceDataset,sentence)
+    # print(tfTemp)
     tfDataset['data'].append(tfTemp)
     # print(numOfSentenceDataset)
-idfs = {'data': []}
 tfidf = {'data': []}
+idf = {'data': []}
+# for word,val in numOfWordsDataset.items():
+#     # print(len(bowDataset['data']))
+#     idf = math.log(len(bowDataset['data'])/val,10)
+#     # print(idf)
+#     print(word, val)
+#     print(idf)
+# print(idf)
+
+# print(tfDataset)
 
 for sentence in tfDataset['data']:
     # mencari nilai IDF pada setiap kalimat dataset
     # len diambil untuk menghitung total dari kalimat yang ada
     # IDF menggunakan numOfWordsDataset karena menghitung setiap kata pada kalimat pada seluruh kata unik yang ada
-    idfsTemp = IDF([numOfWordsDataset,sentence],len(Dataset['data']))
-    tfidfTemp = TFIDF(sentence,idfsTemp)
+    idfsTemp = IDF([numOfWordsDataset],len(Dataset['data']))
+    # print(idfsTemp)
+    # print(sentence)
+
+    idf['data'].append(idfsTemp)
+
+# print(idf)
+for sentence in tfDataset['data']:
+    # print(sentence)
+    tfidfTemp = TFIDF(sentence, idf['data'])
+    # print(tfidfTemp)
     tfidf['data'].append(tfidfTemp)
 
+# print(tfidf)
 value = {'data': []}
 for sentence in tfidf['data']:
+    # print(sentence)
     # nilai tfidf diubah menjadi nilai rata-rata
     value['data'].append(statistics.mean(sentence.values()))
 print(value)
@@ -122,3 +149,4 @@ clf = KNN(k=k)
 clf.fit(X_train, y_train)
 predictions = clf.predict(X_test)
 print("KNN classification accuracy", accuracy(y_test, predictions))
+

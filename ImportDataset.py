@@ -43,14 +43,6 @@ def TFIDF(tfBagOfWords, idfs):
         tfidf[word] = tf * idfs[0][word]
     return tfidf
 
-def deEmojify(text):
-    regrex_pattern = re.compile(pattern = "["
-        u"\U0001F600-\U0001F64F"  # emoticons
-        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
-        u"\U0001F680-\U0001F6FF"  # transport & map symbols
-        u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
-                           "]+", flags = re.UNICODE)
-    return regrex_pattern.sub(r'',text)
 
 data = []
 with open(r"./WhatsApp_Chat_with_Pop_Aga_13yo_Cbb.txt",encoding="utf-8",mode='r') as f:
@@ -116,7 +108,8 @@ for sentence in DatasetDict['data']:
         # print("line:" + line)
         # for i in lst:
         text = line
-        clean(text, no_emoji=True)
+        # clean(text, no_emoji=True)
+        # menghilangkan data url
         match = re.findall(pattern, line)
         if (len(match) > 0):
             for m in match:
@@ -124,12 +117,23 @@ for sentence in DatasetDict['data']:
                 text = text.replace(url,'')
         Tokenizing['data'].append(
             text
+                # menghilangkan kata <Media omitted> yang berarti berisikan media
                 .replace('<Media omitted>','')
                 # .replace(match[0][0],'')
+
+                # menghilangkan enter
                 .replace('\n', '')
+
+                # menghilangkan punctuation
                 .translate(str.maketrans('','',string.punctuation))
+
+                # menghilangkan spasi yang berlebih pada awal dan akhir kalimat
                 .strip()
+
+                # semua kata menjadi huruf kecil
                 .lower()
+
+                # memisahkan data berdasarkan spasi
                 .split(' ')
         )
 #
@@ -137,9 +141,7 @@ uniqueWords = set()
 # print(Tokenizing['data'])
 for words in Tokenizing['data']:
     text = words
-    # print(set(text))
-    # text = clean(text, no_emoji=True)
-
+    # Membuat dataset yang berisikan hanya kata yang tidak redundan
     uniqueWords = uniqueWords.union(set(text))
 # uniqueWords.remove('')
 # print(uniqueWords)
@@ -150,7 +152,7 @@ numOfWordsDataset = dict.fromkeys(uniqueWords, 0)
 for sentence in Tokenizing['data']:
     for word in set(sentence):
         # print(word)
-        #mencari jumlah setiap kata muncul dari seluruh dataset
+        # mencari jumlah setiap kata muncul dari seluruh dataset
         numOfWordsDataset[word] += 1
 # print(numOfWordsDataset)
 

@@ -7,6 +7,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import statistics
 import string
 import math
+from cleantext import clean
 
 def TF(wordDict, bagOfWords):
     tfDict = {}
@@ -70,12 +71,14 @@ bowDataset = {'data': []}
 
 for sentence in Dataset['data']:
     # .translate(str.maketrans('','',string.punctuation)) digunakan untuk menghilangkan tanda baca
+    # print(sentence)
     bowDataset['data'].append(sentence.translate(str.maketrans('','',string.punctuation)).lower().split(' '))
-
+# print(bowDataset)
 
 uniqueWords = set()
 for word in bowDataset['data']:
     #untuk mencari semua kata pada dataset
+    print(set(clean(word, no_emoji=True)))
     uniqueWords = uniqueWords.union(set(word))
     # print(uniqueWords)
 
@@ -135,7 +138,7 @@ for sentence in tfidf['data']:
     # print(sentence)
     # nilai tfidf diubah menjadi nilai rata-rata
     value['data'].append(statistics.mean(sentence.values()))
-print(value)
+# print(value)
 
 
 X, y = value['data'], Dataset['intent']

@@ -49,15 +49,17 @@ with open(r"./WhatsApp_Chat_with_Pop_Aga_13yo_Cbb.txt",encoding="utf-8",mode='r'
     data.append(f.readlines())
 with open(r"./WhatsApp_Chat_with_Andini__Amanda.txt",encoding="utf-8",mode='r') as f:
     data.append(f.readlines())
-# with open(r"./WhatsApp_Chat_with_Rian_davi_10yo.txt",encoding="utf-8",mode='r') as f:
-#     data.append(f.readlines())
-# with open(r"./WhatsApp_Chat_with_Billy_Toby_10__AGI_7.txt",encoding="utf-8",mode='r') as f:
-#     data.append(f.readlines())
-# with open(r"./WhatsApp_Chat_with_Garin__Abiyasa_14_Yo_CBB.txt",encoding="utf-8",mode='r') as f:
-#     data.append(f.readlines())
+with open(r"./WhatsApp_Chat_with_Rian_davi_10yo.txt",encoding="utf-8",mode='r') as f:
+    data.append(f.readlines())
+with open(r"./WhatsApp_Chat_with_Billy_Toby_10__AGI_7.txt",encoding="utf-8",mode='r') as f:
+    data.append(f.readlines())
+with open(r"./WhatsApp_Chat_with_Garin__Abiyasa_14_Yo_CBB.txt",encoding="utf-8",mode='r') as f:
+    data.append(f.readlines())
 # print(data[0][1])
 # exportdata = {'data': pd.DataFrame(columns=['Date', 'Time', 'Name', 'Message'])}
 exportdata = {'data': pd.DataFrame(columns=['Message'])}
+# for i in data:
+#     print(len(i))
 for conversation in data:
     cleaned_data = []
     for line in conversation:
@@ -83,12 +85,14 @@ for conversation in data:
         else:
             new = cleaned_data[-1][-1] + " " + line
             cleaned_data[-1][-1] = new
-        # df = pd.DataFrame(cleaned_data, columns = ['Date', 'Time', 'Name', 'Message'])
-        df = pd.DataFrame(cleaned_data, columns=['Message'])
+    # df = pd.DataFrame(cleaned_data, columns = ['Date', 'Time', 'Name', 'Message'])
+    df = pd.DataFrame(cleaned_data, columns=['Message'])
 
-        frames = [exportdata['data'],df]
-        exportdata['data'] = pd.concat(frames,sort=False)
-# print(exportdata)
+    frames = [exportdata['data'],df]
+    # frames = [exportdata, df]
+    exportdata['data'] = pd.concat(frames,sort=False)
+    # exportdata = pd.concat(frames, sort=False)
+# print(len(exportdata['data']))
 # exportdata.to_excel('chat_history.xlsx', index=False)
 #
 # pd.set_option('display.max_rows', None)
@@ -97,16 +101,11 @@ for conversation in data:
 # pd.set_option('display.max_colwidth', None)
 #
 DatasetDict = {'data': exportdata['data'].values}
-# print(DatasetDict['data'])
-# print (DatasetDict)
+
 Tokenizing = {'data': []}
-# print(MessageData)
 pattern=r'(?i)\b((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?«»“”‘’]))';
 for sentence in DatasetDict['data']:
     for line in sentence:
-        # lst = re.findall('\S+http://\S+|\S+https://\S+', line)
-        # print("line:" + line)
-        # for i in lst:
         text = line
         # clean(text, no_emoji=True)
         # menghilangkan data url
@@ -115,85 +114,69 @@ for sentence in DatasetDict['data']:
             for m in match:
                 url = m[0]
                 text = text.replace(url,'')
-        Tokenizing['data'].append(
-            text
-                # menghilangkan kata <Media omitted> yang berarti berisikan media
-                .replace('<Media omitted>','')
-                # .replace(match[0][0],'')
+        if text != '':
+            Tokenizing['data'].append(
+                text
+                    # menghilangkan kata <Media omitted> yang berarti berisikan media
+                    .replace('<Media omitted>','')
+                    # .replace(match[0][0],'')
 
-                # menghilangkan enter
-                .replace('\n', '')
+                    # menghilangkan enter
+                    .replace('\n', '')
 
-                # menghilangkan punctuation
-                .translate(str.maketrans('','',string.punctuation))
+                    # menghilangkan punctuation
+                    .translate(str.maketrans('','',string.punctuation))
 
-                # menghilangkan spasi yang berlebih pada awal dan akhir kalimat
-                .strip()
+                    # menghilangkan spasi yang berlebih pada awal dan akhir kalimat
+                    .strip()
 
-                # semua kata menjadi huruf kecil
-                .lower()
+                    # semua kata menjadi huruf kecil
+                    .lower()
 
-                # memisahkan data berdasarkan spasi
-                .split(' ')
-        )
-#
+                    # memisahkan data berdasarkan spasi
+                    .split(' ')
+            )
+
 uniqueWords = set()
-# print(Tokenizing['data'])
+
 for words in Tokenizing['data']:
     text = words
     # Membuat dataset yang berisikan hanya kata yang tidak redundan
     uniqueWords = uniqueWords.union(set(text))
 # uniqueWords.remove('')
-# print(uniqueWords)
-#
-#
 numOfWordsDataset = dict.fromkeys(uniqueWords, 0)
-#
+
 for sentence in Tokenizing['data']:
     for word in set(sentence):
-        # print(word)
         # mencari jumlah setiap kata muncul dari seluruh dataset
         numOfWordsDataset[word] += 1
-# print(numOfWordsDataset)
 
-#
 tfDataset = {'data': []}
 for sentence in Tokenizing['data']:
     numOfSentenceDataset = dict.fromkeys(sentence,0)
     for word in sentence:
-        #mencari jumlah kata muncul dari sebuah kalimat
+        # mencari jumlah kata muncul dari sebuah kalimat
         numOfSentenceDataset[word] += 1
-    #Menghitung nilai Term Frequency untuk setiap kalimat
+    # Menghitung nilai Term Frequency untuk setiap kalimat
     tfTemp = TF(numOfSentenceDataset,sentence)
-    # print(tfTemp)
     tfDataset['data'].append(tfTemp)
-    # print(numOfSentenceDataset)
-# print(tfDataset)
 tfidf = {'data': []}
 idf = {'data': []}
-#
-#
+
 for sentence in tfDataset['data']:
     # mencari nilai IDF pada setiap kalimat dataset
     # len diambil untuk menghitung total dari kalimat yang ada
     # IDF menggunakan numOfWordsDataset karena menghitung setiap kata pada kalimat pada seluruh kata unik yang ada
-    idfsTemp = IDF([numOfWordsDataset],len(DatasetDict['data']))
-    # print(idfsTemp)
-    # print(sentence)
+    idfsTemp = IDF([numOfWordsDataset],len(exportdata['data']))
 
     idf['data'].append(idfsTemp)
 
-# print(idf)
 for sentence in tfDataset['data']:
-    # print(sentence)
     tfidfTemp = TFIDF(sentence, idf['data'])
-    # print(tfidfTemp)
     tfidf['data'].append(tfidfTemp)
 
-# print(tfidf)
 value = {'data': []}
 for sentence in tfidf['data']:
-    # print(sentence)
     # nilai tfidf diubah menjadi nilai rata-rata
     value['data'].append(statistics.mean(sentence.values()))
-# print(value)
+print(value)

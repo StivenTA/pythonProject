@@ -9,6 +9,13 @@ import pandas as pd # pip install pandas openpyxl
 from cleantext import clean
 import math
 import statistics
+import nltk
+
+nltk.download('stopwords')
+nltk.download('punkt')
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize,sent_tokenize
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 
 def TF(wordDict, bagOfWords):
     tfDict = {}
@@ -101,9 +108,22 @@ for conversation in data:
 # pd.set_option('display.max_colwidth', None)
 #
 DatasetDict = {'data': exportdata['data'].values}
-
+factory = StemmerFactory()
+stemmer = factory.create_stemmer()
 Tokenizing = {'data': []}
+stem_word = {'data':[]}
+# print(DatasetDict['data'])
+# for sentence in DatasetDict['data']:
+#     # print(stemmer.stem(sentence))
+#     for word in sentence:
+#         print(stemmer.stem(word))
+    # print(sentence)
 pattern=r'(?i)\b((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?«»“”‘’]))';
+
+# for sentence in DatasetDict['data']:
+#     stem_word['data'].append(stemmer.stem(sentence))
+#
+
 for sentence in DatasetDict['data']:
     for line in sentence:
         text = line
@@ -114,6 +134,9 @@ for sentence in DatasetDict['data']:
             for m in match:
                 url = m[0]
                 text = text.replace(url,'')
+        # print(text)
+        text = stemmer.stem(text)
+        # print(text)
         if text != '':
             Tokenizing['data'].append(
                 text
@@ -136,23 +159,31 @@ for sentence in DatasetDict['data']:
                     # memisahkan data berdasarkan spasi
                     .split(' ')
             )
-
+# print(Tokenizing['data'])
+clear_Data = {'data':[]}
+stop = set(stopwords.words('indonesian'))
+for sentence in Tokenizing['data']:
+    temp_sentence = {'data':[]}
+    for word in sentence:
+        if word not in stop:
+            temp_sentence['data'].append(word)
+    clear_Data['data'].append(temp_sentence['data'])
+# print(clear_Data)
 uniqueWords = set()
-
-for words in Tokenizing['data']:
+for words in clear_Data['data']:
     text = words
     # Membuat dataset yang berisikan hanya kata yang tidak redundan
     uniqueWords = uniqueWords.union(set(text))
 # uniqueWords.remove('')
 numOfWordsDataset = dict.fromkeys(uniqueWords, 0)
 
-for sentence in Tokenizing['data']:
+for sentence in clear_Data['data']:
     for word in set(sentence):
         # mencari jumlah setiap kata muncul dari seluruh dataset
         numOfWordsDataset[word] += 1
 
 tfDataset = {'data': []}
-for sentence in Tokenizing['data']:
+for sentence in clear_Data['data']:
     numOfSentenceDataset = dict.fromkeys(sentence,0)
     for word in sentence:
         # mencari jumlah kata muncul dari sebuah kalimat

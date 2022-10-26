@@ -8,7 +8,7 @@ def euclidean_distance(x1, x2):
 
 
 class KNN:
-    def __init__(self, k=3):
+    def __init__(self, k=7):
         self.k = k
 
     def fit(self, X, y):

@@ -83,26 +83,17 @@ for text in clean_word['data']:
     uniqueWords = uniqueWords.union(set(text))
 # uniqueWords.remove('')
 numOfWordsDataset = dict.fromkeys(uniqueWords, 0)
+
 label = preprocessing.LabelEncoder()
-testingIntent = pd.DataFrame(tokenizing)
-testingIntent['intent'] = label.fit_transform(testingIntent['intent'])
-testingIntent['intent'] = testingIntent['intent'].astype('category')
-# print(testingIntent['intent'].unique())
-uniqueIntent = set(tokenizing['intent'])
-# print(len(uniqueIntent))
-uniqueIntent.union(set(tokenizing['intent']))
-numofIntentDataset = dict.fromkeys(uniqueIntent,0)
-# print(numofIntentDataset)
+intent = pd.DataFrame(tokenizing)
+intent['intent'] = label.fit_transform(intent['intent'])
+intent['intent'] = intent['intent'].astype('category')
 
 for sentence in clean_word['data']:
     for word in set(sentence):
         numOfWordsDataset[word] += 1
         # mencari jumlah setiap kata muncul dari seluruh dataset
 
-for intent in tokenizing['intent']:
-    numofIntentDataset[intent] += 1
-print(numOfWordsDataset)
-print(numofIntentDataset)
 tfDataset = {'data': []}
 for sentence in clean_word['data']:
     numOfSentenceDataset = dict.fromkeys(sentence,0)
@@ -121,26 +112,21 @@ for sentence in tfDataset['data']:
     # len diambil untuk menghitung total dari kalimat yang ada
     # IDF menggunakan numOfWordsDataset karena menghitung setiap kata pada kalimat pada seluruh kata unik yang ada
     idfsTemp = IDF([numOfWordsDataset],len(clean_word['data']))
-    idfsTempIntent = IDF([numofIntentDataset],len(clean_word['data']))
     idf['data'].append(idfsTemp)
-    idf['intent'].append(idfsTempIntent)
-# print(idf['intent'])
+
 for sentence in tfDataset['data']:
     tfidfTemp = TFIDF(sentence, idf['data'])
     tfidf['data'].append(tfidfTemp)
 value = {'data': [],'intent':[]}
-# print(tfidf['intent'])
 
 for sentence in tfidf['data']:
     # print(sentence[0])
     # nilai tfidf diubah menjadi nilai rata-rata
     if sentence.values():
-        # print(sentence.values())
         value['data'].append(statistics.mean(sentence.values()))
     else:
         value['data'].append(0)
-    # print(value['data'])
-for intent in testingIntent['intent']:
+for intent in intent['intent']:
     value['intent'].append(intent)
 
 X, y = value['data'], value['intent']
@@ -148,10 +134,6 @@ for i in range(100):
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.1, random_state=1000
     )
-    # print(len(X_train))
-    # print(len(X_test))
-    # print(len(y_train))
-    # print(len(y_test))
     k = 5
     clf = KNN(k=k)
     clf.fit(X_train, y_train)

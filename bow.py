@@ -177,12 +177,12 @@ print(point)
 #     value['intent'].append(intent)
 #
 X, y = point['data'], point['intent']
-for i in range(100):
+for i in range(3,15,2):
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=1000
+        X, y, test_size=0.3, random_state=1000
     )
-    k = 5
+    k = i
     clf = KNN(k=k)
     clf.fit(X_train, y_train)
     predictions = clf.predict(X_test)
-    print("KNN classification accuracy in " + str(i) + ": ", accuracy(y_test, predictions))
+    print("KNN classification accuracy in (k = " + str(i) + "): ", accuracy(y_test, predictions))

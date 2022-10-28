@@ -44,4 +44,4 @@ myListIntent = [dataDict[i][1] for i in sorted(dataDict.keys())]
 #     index+=1
 # print(type(newDict.setdefault(1)))
 # print(newDict.get(index, myList[i]))
-print(newDict)
+# print(newDict)

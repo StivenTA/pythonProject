@@ -58,10 +58,22 @@ def accuracy(y_true, y_pred):
 data = pd.read_excel("Chat_Intent.xlsx")
 message = {'data': data['Message'],
            'intent': data['Intent']}
+
 tokenizing = {'data': [],'intent':[]}
+# tokenizing = []
 factory = StemmerFactory()
 stemmer = factory.create_stemmer()
 pattern=r'(?i)\b((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?«»“”‘’]))';
+
+# for word in message:
+#     if word == 'data':
+#         for text in message[word]:
+#             text = stemmer.stem(text)
+#             tokenizing[word].append(word_tokenize(text))
+#     else:
+#         for intent in message[word]:
+#             tokenizing[word].append(intent)
+# print(tokenizing)
 for word in message['data']:
     text = word
     text = stemmer.stem(text)
@@ -69,23 +81,36 @@ for word in message['data']:
 for intent in message['intent']:
     tokenizing['intent'].append(intent)
 stop = set(stopwords.words('indonesian'))
-clean_word = {'data': []}
-for sentence in tokenizing['data']:
-    temp_sentence = {'data':[]}
-    for word in sentence:
-        if word not in stop and word != '':
-            temp_sentence['data'].append(word)
-    clean_word['data'].append(temp_sentence['data'])
-# print(len(clean_word['data']))
+clean_word = {'data': [],'intent':[]}
+for sentence in tokenizing:
 
+    if sentence == 'data':
+        for each in tokenizing[sentence]:
+            temp_sentence = {'data': [], 'intent': []}
+            for word in each:
+                if word not in stop:
+                    temp_sentence['data'].append(word)
+            clean_word['data'].append(temp_sentence['data'])
+    else:
+        for intent in tokenizing[sentence]:
+            clean_word['intent'].append(intent)
+# print(clean_word['data'])
+# for sentence in tokenizing:
+#     temp_sentence = {'data':[]}
+#     for word in sentence:
+#         if word not in stop and word != '':
+#             temp_sentence['data'].append(word)
+#     clean_word['data'].append(temp_sentence['data'])
+# print(len(clean_word['data']))
+#
 uniqueWords = set()
 for text in clean_word['data']:
     uniqueWords = uniqueWords.union(set(text))
 # uniqueWords.remove('')
 numOfWordsDataset = dict.fromkeys(uniqueWords, 0)
-
+#
 label = preprocessing.LabelEncoder()
-intent = pd.DataFrame(tokenizing)
+intent = pd.DataFrame(clean_word)
 intent['intent'] = label.fit_transform(intent['intent'])
 intent['intent'] = intent['intent'].astype('category')
 
@@ -93,7 +118,7 @@ for sentence in clean_word['data']:
     for word in set(sentence):
         numOfWordsDataset[word] += 1
         # mencari jumlah setiap kata muncul dari seluruh dataset
-
+#
 tfDataset = {'data': []}
 for sentence in clean_word['data']:
     numOfSentenceDataset = dict.fromkeys(sentence,0)
@@ -117,22 +142,44 @@ for sentence in tfDataset['data']:
 for sentence in tfDataset['data']:
     tfidfTemp = TFIDF(sentence, idf['data'])
     tfidf['data'].append(tfidfTemp)
-value = {'data': [],'intent':[]}
-
-for sentence in tfidf['data']:
-    # print(sentence[0])
-    # nilai tfidf diubah menjadi nilai rata-rata
-    if sentence.values():
-        value['data'].append(statistics.mean(sentence.values()))
-    else:
-        value['data'].append(0)
 for intent in intent['intent']:
-    value['intent'].append(intent)
-
-X, y = value['data'], value['intent']
+    tfidf['intent'].append(intent)
+value = {'data': [],'intent':[]}
+#
+for x,y in tfidf.items():
+    if x == 'data':
+        for word in tfidf[x]:
+            if word.values():
+                value['data'].append(statistics.mean(word.values()))
+            else:
+                value['data'].append(0)
+    elif x == 'intent':
+        for intent in tfidf[x]:
+            value['intent'].append(intent)
+exportData = pd.DataFrame(value)
+# exportData.to_excel("distance_dataset.xlsx",index=False)
+point_dataset = pd.read_excel("distance_dataset.xlsx")
+point = {'data':[],
+         'intent': []}
+for data in point_dataset['data']:
+    point['data'].append(data)
+for intent in point_dataset['intent']:
+    point['intent'].append(intent)
+print(point)
+# for sentence in tfidf['data']:
+#     # print(sentence[0])
+#     # nilai tfidf diubah menjadi nilai rata-rata
+#     if sentence.values():
+#         value['data'].append(statistics.mean(sentence.values()))
+#     # else:
+#     #     value['data'].append(0)
+# for intent in intent['intent']:
+#     value['intent'].append(intent)
+#
+X, y = point['data'], point['intent']
 for i in range(100):
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.1, random_state=1000
+        X, y, test_size=0.2, random_state=1000
     )
     k = 5
     clf = KNN(k=k)

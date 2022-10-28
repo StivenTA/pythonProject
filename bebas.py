@@ -21,6 +21,7 @@ for j in data["Intent"]:
 for i, items in dataDict.items():
     if items[1] == "Farewell":
         print(items[0])
+# halo
 
 # kalau mau akses isi Intent saja [i][value]
 # value nya beda in aja jadi 1 untuk Intent, 0 untuk Message

@@ -24,7 +24,7 @@ def handle_command(update, context):
 
 def error(update, context):
     print(f"Update {update} caused error {context.error}")
-
+    update.message.reply_text("maaf untuk pertanyaan bapak/ibu masih belum dapat dimengerti oleh chatbot. Atas ketidakmampuan chatbot maka bapak/ibu dapat lansung menghubungi admin melalui no hp (0801241530453)")
 def main():
     updater = Updater(keys.API_KEY, use_context = True)
     dp = updater.dispatcher

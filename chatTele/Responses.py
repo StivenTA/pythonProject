@@ -17,13 +17,13 @@ stop = set(stopwords.words('indonesian'))
 
 def sample_responses(input_text):
     user_message = []
-    user_message.append(str(input_text).lower())
+    user_message.append(input_text)
     message = dataframe['Message']
 
     X = []
     for kata in message:
         X.append(stemmer.stem(kata))
-    X.append(stemmer.stem(input_text[0]))
+    X.append(stemmer.stem(user_message[0]))
     # print(X[len(X)-1])
     vectorize = feature_extraction.text.CountVectorizer(stop_words=stop)
     vectorize.fit(X)

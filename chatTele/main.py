@@ -1,9 +1,9 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+# BOT-API KEY
 import Constants as keys
+from telegram import Update
+# pip install python-telegram-bot
 from telegram.ext import *
+# from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import Responses as R
 
 def print_hi(name):
@@ -26,7 +26,7 @@ def error(update, context):
     print(f"Update {update} caused error {context.error}")
 
 def main():
-    updater = Updater(keys.API_KEY, use_context=True)
+    updater = Updater(keys.API_KEY, use_context = True)
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler("start", start_command))
@@ -35,12 +35,12 @@ def main():
     dp.add_handler(MessageHandler(Filters.text, handle_command))
 
     dp.add_error_handler(error)
-    updater.start_polling(3)
+    updater.start_polling()
     updater.idle()
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('User')
+    # print_hi('User')
     main()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

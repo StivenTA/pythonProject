@@ -6,10 +6,8 @@ from sklearn import feature_extraction
 import pandas as pd
 
 loaded_model = pickle.load(open('model_pickle_CV','rb'))
-data = pd.read_excel('Chat_Intent.xlsx')
+loaded_data_training = pickle.load(open('training_data_vectorize','rb'))
 
-intent = data.groupby("Intent").filter(lambda x: len(x) >= 5)
-dataframe = data[(data.Intent.isin(intent['Intent']))].reset_index(drop=True)
 
 factory = StemmerFactory()
 stemmer = factory.create_stemmer()
@@ -18,18 +16,12 @@ stop = set(stopwords.words('indonesian'))
 def sample_responses(input_text):
     user_message = []
     user_message.append(input_text)
-    message = dataframe['Message']
-
-    X = []
-    for kata in message:
-        X.append(stemmer.stem(kata))
-    X.append(stemmer.stem(user_message[0]))
     # print(X[len(X)-1])
-    vectorize = feature_extraction.text.CountVectorizer(stop_words=stop)
-    vectorize.fit(X)
-    X = vectorize.fit_transform(X)
+    vectorize = loaded_data_training
 
-    prediction = loaded_model.predict(X)
+    user_message_transform = vectorize.transform(user_message)
+
+    prediction = loaded_model.predict(user_message_transform)
 
     if prediction[len(prediction)-1] == 0:
         return "Baik Ibu/ Bapak, kelas akan ditiadakan untuk murid"
@@ -59,5 +51,5 @@ def sample_responses(input_text):
         return "Baik Ibu/ Bapak, dapat langsung memasuki kelas melalui link zoom berikut ini"
 
 
-    return "Jika ada yang ingin ditanyakan lebih detail, dapat dihubungi admin melalui no hp ()"
+    return "maaf untuk pertanyaan bapak/ibu masih belum dapat dimengerti oleh chatbot. Atas ketidakmampuan chatbot maka bapak/ibu dapat lansung menghubungi admin melalui no hp (0801241530453)"
 

@@ -26,19 +26,54 @@ def sample_responses(input_text):
     if prediction[len(prediction)-1] == 0:
         return "Baik Ibu/ Bapak, kelas akan ditiadakan untuk murid"
     if prediction[len(prediction)-1] == 1:
-        return "Intent: Ask Attendence"
+        return "Bapak/Ibu, kami tetap akan beroperasi secara normal dari hari senin hingga sabtu"\
+    "secara offline maupun online dan jika anak Bapak/Ibu mengalami keterlambatan atau ingin mengambil izin untuk tidak masuk" \
+    "silakan untuk memberikan alasan terhadap ketidakmasukannya."
     if prediction[len(prediction)-1] == 2:
-        return "Intent: Ask Class"
+        return "Bapak/Ibu kelas bisa dilakukan secara online maupun offline dan maksimal murid perkelasnya ialah 3 murid"
+
     if prediction[len(prediction)-1] == 3:
-        return "Intent: Ask Course"
+        return "SD Level:\n"\
+    "Memperdalam konsep coding, Computational Thinking,"\
+    "dan computer science: menggunakan online platforms popular:"\
+    "Tynker, Scratch, CodeMonkey, MIT App Inventor, Grok Learning membuat"\
+    "animasi, video game, web pages, mobile apps membuat custom Minecraft mod"\
+    "latihan computational thinking untuk kompetisi Bebras perkenalan ke dasar"\
+    "text-based coding languages (HTML, Python, Java, C++, C, Javascript) dan"\
+    "konsep Artificial Intelligent – Maching Learning."\
+    "\n"\
+    "SMP Level:\n"\
+    "Memperdalam konsep coding, Computational Thinking, dan"\
+    "computer science untuk level SMP: perkenalan dasar coding dengan"\
+    "menggunakan block programming dan dilanjutkan ke text-based coding languages"\
+    "(HTML, Python, Java, C++, C, Javascript) membuat animasi, websites,"\
+    "mobile apps, games dengan menggunakan programming latihan computational thinking"\
+    "untuk kompetisi Bebras perkenalan konsep Artificial Intelligent – Maching Learning"
+    "\n"\
+    "SMA Level:\n"\
+    "Memperdalam konsep programming dan dilanjutkan dengan eksplorasi"\
+    "coding di area berikut: Game Development Web Development App Development Computer Science,"\
+    "Algorithm, and Math in Coding Data, Database and AI Intro"
+
     if prediction[len(prediction)-1] == 4:
-        return "Intent: Ask Finance"
+        return "SD Level:\n"\
+        "Green(14 sesi) 2jt 250rb"\
+        "Purple(29 sesi) 4jt 500rb" \
+               "\n" \
+        "SMP Level\n:"\
+        "Green(14 sesi) 2jt 550rb"\
+        "Purple(29 sesi) 5jt 100rb" \
+               "\n" \
+        "SMA Level\n:"\
+        "Green(14 sesi) 2jt 850rb"\
+        "Purple(29 sesi) 5jt 700rb"\
+
     if prediction[len(prediction)-1] == 5:
-        return "Intent: Ask Milestone"
+        return " Baik Ibu/Bapak, proses pengiriman percapaian Ibu/Bapak akan kami kirimkan secara bentuk non-fisik dan fisik"
     if prediction[len(prediction)-1] == 6:
-        return "Intent: Ask Payment"
+        return "Bapak/Ibu terhomat pembayaran dapat dikirim kepada nomor rekening BCA berikut ini 0123 016 111"
     if prediction[len(prediction)-1] == 7:
-        return "Intent: Ask Progress"
+        return "Ibu/Bapak dapat melihat progress anak bapak melalui aplikasi Kodekiddo kami"
     if prediction[len(prediction)-1] == 8:
         return "Baik Ibu/ Bapak, proses perubahan kelas akan dilakukan oleh admin"
     if prediction[len(prediction)-1] == 9:

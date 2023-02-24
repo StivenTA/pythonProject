@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from sklearn import model_selection
 from sklearn.model_selection import KFold
 from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import cross_val_score
 import xgboost as xgb
 import pandas as pd
 from sklearn.metrics import mean_squared_error
@@ -15,6 +16,9 @@ from sklearn import datasets
 from sklearn.preprocessing import LabelEncoder
 from sklearn import svm
 from sklearn.neural_network import MLPClassifier
+from deepchecks.tabular import Dataset
+from deepchecks.tabular.checks import ConflictingLabels
+from deepchecks.tabular.datasets.classification.phishing import load_data
 # from pycaret.classification import *
 #
 
@@ -26,18 +30,17 @@ def get_score(model, X_train, X_test, y_train, y_test):
 # y = np.array([0, 0, 1, 1])
 le = LabelEncoder
 df = pd.read_excel("distance_dataset.xlsx")
-# print(df)
 array = df.values
 X = array[:,0:1]
 y = array[:,1]
 y = np.int_(y)
 # print(X.shape)
 # print(type(y[0]))
-# print(y)
+# print(set(y))
 
 skf = StratifiedKFold(n_splits=5,random_state=1,shuffle=True)
 # print(skf)
-# skf.get_n_splits(x,y)
+skf.get_n_splits(X,y)
 # print(skf)
 model = xgb.XGBClassifier(n_estimators = 400, learning_rate = 0.1, max_depth = 3)
 svm_model = svm.SVC()
@@ -49,11 +52,16 @@ params = {
     'max_depth': 4,
     'alpha': 10,
     'learning_rate': 1.0,
-    'n_estimators': 100
+    'n_estimators': 100,
+    'booster': 'gbtree',
+    # 'error_score': 'raise'
 }
 
 # instantiate the classifier
 xgb_clf = xgb.XGBClassifier(**params)
+# xgb_clf.get_n_split(X,y)
+# score = cross_val_score(xgb_clf,X,le().fit_transform(y),cv=10)
+# print(score.mean(), score.min(),score.max())
 # # print(skf)
 classification_report_MLP = []
 classification_report_SVM = []
@@ -66,10 +74,12 @@ for train_index, test_index in skf.split(X, y):
     # print(y_train)
     xgb_clf.fit(X_train,y_train)
     prediction = xgb_clf.predict(X_test)
-    predictions = [round(value) for value in prediction]
-    report = confusion_matrix(y_test,predictions)
-    print(report)
-    classification_report_XGBoost.append(report)
+    # predictions = [round(value) for value in prediction]
+    # report = classification_report(y_test,predictions)
+    # print(report)
+    # classification_report_XGBoost.append(report)
+    score = accuracy_score(prediction,y_test)
+    classification_report_XGBoost.append(score)
 
     svm_model.fit(X_train,y_train)
     svm_prediction = svm_model.predict(X_test)
@@ -83,7 +93,7 @@ for train_index, test_index in skf.split(X, y):
     report_mlp = classification_report(y_test,mlp_prediction)
     # print(report_mlp)
     classification_report_MLP.append(report_mlp)
-# print(classification_report_XGBoost)
+print(classification_report_XGBoost)
 # for i in accuracy:
 #     print(i)
 # params = {"objective":"binary:logistic",'colsample_bytree': 0.3,'learning_rate': 0.1,

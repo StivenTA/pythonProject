@@ -15,7 +15,7 @@ stop = set(stopwords.words('indonesian'))
 
 def sample_responses(input_text):
     user_message = []
-    user_message.append(input_text)
+    user_message.append(stemmer.stem(input_text))
     # print(X[len(X)-1])
     vectorize = loaded_data_training
 

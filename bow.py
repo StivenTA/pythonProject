@@ -9,6 +9,8 @@ import math
 from Testing import KNN
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
+from sklearn.model_selection import KFold
+from sklearn.metrics import accuracy_score
 
 nltk.download('stopwords')
 nltk.download('punkt')
@@ -103,22 +105,35 @@ for sentence in tokenizing:
 #     clean_word['data'].append(temp_sentence['data'])
 # print(len(clean_word['data']))
 #
+
 uniqueWords = set()
 for text in clean_word['data']:
     uniqueWords = uniqueWords.union(set(text))
 # uniqueWords.remove('')
 numOfWordsDataset = dict.fromkeys(uniqueWords, 0)
-#
+
+
 label = preprocessing.LabelEncoder()
 intent = pd.DataFrame(clean_word)
 intent['intent'] = label.fit_transform(intent['intent'])
 intent['intent'] = intent['intent'].astype('category')
+# print(intent['intent'])
+# print(testingIntent['intent'].unique())
+uniqueIntent = set(tokenizing['intent'])
+# print(len(uniqueIntent))
+uniqueIntent.union(set(tokenizing['intent']))
+numofIntentDataset = dict.fromkeys(uniqueIntent,0)
+# print(numofIntentDataset)
+
+for intent in tokenizing['intent']:
+    numofIntentDataset[intent] += 1
+print(numofIntentDataset)
 
 for sentence in clean_word['data']:
     for word in set(sentence):
         numOfWordsDataset[word] += 1
         # mencari jumlah setiap kata muncul dari seluruh dataset
-#
+
 tfDataset = {'data': []}
 for sentence in clean_word['data']:
     numOfSentenceDataset = dict.fromkeys(sentence,0)
@@ -157,15 +172,15 @@ for x,y in tfidf.items():
         for intent in tfidf[x]:
             value['intent'].append(intent)
 exportData = pd.DataFrame(value)
-# exportData.to_excel("distance_dataset.xlsx",index=False)
-point_dataset = pd.read_excel("distance_dataset.xlsx")
-point = {'data':[],
-         'intent': []}
-for data in point_dataset['data']:
-    point['data'].append(data)
-for intent in point_dataset['intent']:
-    point['intent'].append(intent)
-print(point)
+# exportData.to_excel("distance_dataset1.xlsx",index=False)
+# point_dataset = pd.read_excel("distance_dataset.xlsx")
+# point = {'data':[],
+#          'intent': []}
+# for data in point_dataset['data']:
+#     point['data'].append(data)
+# for intent in point_dataset['intent']:
+#     point['intent'].append(intent)
+# print(point)
 # for sentence in tfidf['data']:
 #     # print(sentence[0])
 #     # nilai tfidf diubah menjadi nilai rata-rata
@@ -176,13 +191,14 @@ print(point)
 # for intent in intent['intent']:
 #     value['intent'].append(intent)
 #
-X, y = point['data'], point['intent']
-for i in range(3,15,2):
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.3, random_state=1000
-    )
-    k = i
-    clf = KNN(k=k)
-    clf.fit(X_train, y_train)
-    predictions = clf.predict(X_test)
-    print("KNN classification accuracy in (k = " + str(i) + "): ", accuracy(y_test, predictions))
+
+# X, y = point['data'], point['intent']
+# for i in range(3,15,2):
+#     X_train, X_test, y_train, y_test = train_test_split(
+#         X, y, test_size=0.3, random_state=1000
+#     )
+#     k = i
+#     clf = KNN(k=k)
+#     clf.fit(X_train, y_train)
+#     predictions = clf.predict(X_test)
+#     print("KNN classification accuracy in (k = " + str(i) + "): ", accuracy(y_test, predictions))
